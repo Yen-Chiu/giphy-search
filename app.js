@@ -1,67 +1,50 @@
-$('button').on("click", function(){
+var animalArr = ["kangaroo", "tiger", "horse", "monkey", "elephant", "puppies", "kitten", "koala bear", "lion", "rabbit"];
+//for loop to create buttons for existing array
+function createButton(){
+  $(".create-button").empty();
 
-  var result = $(this).attr("data-name");
-  var queryURL = "https://api.giphy.com/v1/gifs/search?&q=" + result + "&api_key=7lR48unx4YJHpS2uhYKm1AQu181KLmAr";
+  for (let i = 0; i < animalArr.length; i++){
+    var newBtn = $("<button>");
+    newBtn.attr("data-animal", animalArr[i]);
+    newBtn.addClass("btn");
+    newBtn.text(animalArr[i]);
+    $(".create-button").append(newBtn);
+  }
+}
+//new search and push into array
+$("#new-search").on("click", function(event){
+    event.preventDefault();
+    var newAnimal = $("#search-input").val().trim();
+    animalArr.push(newAnimal);
+    console.log(newAnimal);
+    createButton();
+});
+
+//initiate API and retrieve information
+function initiateApi(){
+
+  var animal = $(this).attr("data-animal");
+  var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+    animal + "&api_key=7lR48unx4YJHpS2uhYKm1AQu181KLmAr&limit=10";
 
   $.ajax({
-    url: queryURL,
-    method: "GET"
-  })
-  .done(function(response) {
+      url: queryURL,
+      method: "GET"
+    })
+    .done(function(response) {
 console.log(response);
-
+  var resultUrl = response.data;
+//for loop to iterate dynamic element to display images
   for (let i = 0; i < 10; i++){
-      var imageUrl = response.data[i].images.fixed_height_still.url;
-      var newImage = $("<img>");
-        newImage.attr("src", imageUrl);
-        newImage.attr("alt", result);
-        $(".images").prepend(newImage);
-  }
-  console.log(imageUrl);
+      var animalImage = $("<img>");
+      var sourceTag = animalImage.attr("src", resultUrl[i].images.fixed_height_still.url);
+      animalImage.attr('data-still', resultUrl[i].images.fixed_height_still.url);
+      animalImage.attr('data-animate', resultUrl[i].images.fixed_height_still.url);
+      animalImage.attr('data-state', 'still');
+      animalImage.attr('class', 'gif');
+      $(".image").append(animalImage, sourceTag);
+};
 });
-});
-
-
-
-
-
-
-
-  //var api = "http://api.giphy.com/v1/gifs/search";
-  //var apikey = "?api_key=7lR48unx4YJHpS2uhYKm1AQu181KLmAr";
-  //var query = "&q=animalArr[userSelect]";
-/*  function button() {
-      $(".button").empty();
-var animalArr = ["dog", "tiger", "monkey"];
-        for (let i = 0; i < animalArr.length; i++){
-            var newButton = $('<button>');
-                newButton.addClass("btn");
-                newButton.attr("data-name", animalArr[i]);
-                newButton.text(animalArr[i]);
-                $('.button').append(newButton);
-                console.log(animalArr[i]);
-        };
-  };
-
-
-  button();
-  //buttons to target different animals
-  //a search button to add more animal categories
-  //these buttons are generated from JavaScript
-  //add a NEW button after the search category
-  //an array to hold different types of animal buttons
-  //push new search catagory into the Array
-
-  //retrieve Giphy information from API
-  //display result in HTML
-
-
-
-
-
-
-
-
-//pseudo code
-//giphy API access
-*/
+};
+$(document).on('click', '.btn', initiateApi);
+createButton();
